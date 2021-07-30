@@ -1,9 +1,7 @@
 import { Request, Response } from "express";
 
 class GlucoseRecordController {
-    list(request: Request, response: Response) {
-        return response.json('test');
-    }
+    create(request: Request, response: Response) {}
 }
 
 export default GlucoseRecordController;

@@ -1,0 +1,27 @@
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model user {
+  id                        Int      @default(autoincrement()) @id
+  email                     String   @unique
+  login                     String   @unique
+  password                  String   
+}
+
+model glucose_records {
+  id                        Int       @default(autoincrement()) @id
+  gl_per_dl                 Int
+  was_there_consumption     Boolean   @default(false)
+  consumption               String?  
+  insulin_doses_used        String?  
+  created_at                DateTime  @default(now())
+  updated_at                DateTime  @updatedAt
+  // author    User     @relation(fields: [authorId], references: [id])
+  //authorId  Int
+}
