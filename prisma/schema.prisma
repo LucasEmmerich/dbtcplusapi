@@ -8,20 +8,25 @@ generator client {
 }
 
 model user {
-  id                        Int      @default(autoincrement()) @id
-  email                     String   @unique
-  login                     String   @unique
-  password                  String   
-}
+  id                        Int              @default(autoincrement()) @id
+  name                      String          
+  email                     String           @unique
+  login                     String           @unique
+  // cpf                       Int?             @unique
+  password                  String          
+  glucose_records           glucose_record[]
+  created_at                DateTime?        @default(now())
+  updated_at                DateTime?        @updatedAt
+}       
 
-model glucose_records {
-  id                        Int       @default(autoincrement()) @id
-  gl_per_dl                 Int
-  was_there_consumption     Boolean   @default(false)
-  consumption               String?  
-  insulin_doses_used        String?  
-  created_at                DateTime  @default(now())
-  updated_at                DateTime  @updatedAt
-  // author    User     @relation(fields: [authorId], references: [id])
-  //authorId  Int
+model glucose_record {       
+  id                        Int              @default(autoincrement()) @id
+  gl_per_dl                 Int       
+  was_there_consumption     Boolean          @default(false)
+  consumption               String?         
+  insulin_doses_used        Int?          
+  user                      user             @relation(fields: [user_id], references: [id])
+  user_id                   Int             
+  created_at                DateTime?        @default(now())
+  updated_at                DateTime?        @updatedAt
 }

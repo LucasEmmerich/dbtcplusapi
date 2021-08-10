@@ -1,27 +1,49 @@
 import { PrismaClient } from '@prisma/client';
 import User from '../models/user';
-import { encrypt } from '../utils/cryptography';
 
-const getConnection = () => new PrismaClient();
+const database = new PrismaClient();
 
-const create = async function (email: string, login: string, password: string) {
-    const user = new User(0, email, login, password);
-    user.password = encrypt(user.password);
-    await getConnection().user.create({
-        data: {
-            email: user.email,
-            login: user.login,
-            password: user.password
-        }
-    });
+async function create(obj: User) {
+    try {
+        await database.user.create({
+            data: {
+                name: obj.name,
+                email: obj.email,
+                login: obj.login,
+                password: obj.password
+            }
+        });
+    }
+    catch (e: any) {
+        throw e;
+    }
 }
 
-const update = async function () {
-
+async function update(obj: User) {
+    try {
+        await database.user.update({
+            where: { id: obj.id },
+            data: {
+                name: obj.name,
+                email: obj.email,
+                login: obj.login,
+                password: obj.password
+            }
+        });
+    }
+    catch (e: any) {
+        throw e;
+    }
 }
 
-const remove = async function () {
-
+async function findOne(filters: any) {
+    try {
+        const user = await database.user.findFirst({ where: filters });
+        return user;
+    }
+    catch (e: any) {
+        throw e;
+    }
 }
 
-export { create, update, remove };
+export { create, update, findOne };
