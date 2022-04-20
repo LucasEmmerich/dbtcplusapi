@@ -6,6 +6,7 @@ import routes from "./routes";
 
 dotenv.config();
 const app = express();
+
 const globalErrorHandler = (err: any, req: any, res: any, next: any) => {
     res.status(500).json({
         status: "error",
@@ -21,4 +22,6 @@ app.use(express.json());
 app.use(routes);
 app.use(globalErrorHandler);
 
-app.listen(PORT, () => { console.log('listening on port ' + PORT) });
+app.listen(PORT, () => {
+    console.log('SERVER UP ON: ' + PORT)
+});

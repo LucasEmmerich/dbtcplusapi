@@ -1,122 +1,107 @@
-import { Request, Response, NextFunction } from "express";
-import { encrypt, verifyHash } from '../utils/cryptography';
+import { Request, Response } from "express";
+import { encrypt } from '../utils/cryptography';
 import { create, update, findOne } from "../services/user-service";
-import { generate, tokenInfo } from "../utils/auth";
+import { loginRegExp, mailRegExp } from "../utils/regex";
+import { generateHashForAccountActivation, tokenInfo } from "../utils/auth";
 import User from "../models/user";
+import { sendAccountActivateEmail } from "../utils/mail/mail";
 
 class UserController {
 
-    async authMiddleware(request: Request, response: Response, forward: NextFunction) {
-        const { authorization } = request.headers;
-        if (!authorization) {
-            return response.status(401).end('Unauthorized');
+    async create(request: Request, response: Response) {
+        const baseUrl = request.protocol + '://' + request.get('host');
+
+        const { name, email, login, password } = request.body;
+
+        const user = new User(0, name, email, login, password);
+        user.password = encrypt(password);
+
+        const validation = user.validate();
+        if (validation.valid) {
+            const createdUser = await create(user);
+
+            const activeAccountHash = generateHashForAccountActivation(createdUser);
+
+            const urlToSend = `${baseUrl}/user/activateAccount?token=${activeAccountHash}`
+
+            await sendAccountActivateEmail(email, { name, url: urlToSend });
+
+            return response.status(201).end('Created');
         }
         else {
-            const { valid, result } = tokenInfo(authorization);
-            if (valid) {
-                const { id, name, login } = result.user;
-                request.body.user_info = { id, name, login };
-                forward();
-            }
+            return response.status(400).json(validation.errors).end('Bad Request');
         }
-    };
-
-    async create(request: Request, response: Response) {
-        const {
-            name,
-            email,
-            login,
-            password
-        } = request.body;
-
-        const encryptedPassword = encrypt(password);
-
-        const user = new User(0, name, email, login, encryptedPassword);
-
-        await create(user);
-
-        return response.status(201).end();
     };
 
     async update(request: Request, response: Response) {
-        const {
-            user_info,
-            name,
-            email,
-            login,
-            password
-        } = request.body;
+        const { user_info, name, email, login, password } = request.body;
 
-        const encryptedPassword = encrypt(password);
+        const user = new User(0, name, email, login, password);
 
-        const user = new User(user_info.id, name, email, login, encryptedPassword);
+        const validation = user.validate();
 
-        await update(user);
+        if (validation.valid) {
+            await update(user_info.id, user);
 
-        return response.status(201).end();
-    };
-
-    async authenticate(request: Request, response: Response) {
-        const {
-            login,
-            password
-        } = request.body;
-
-        const user = await findOne({ login });
-
-        if (!user) {
-            return response.status(200).json({
-                authorized: false,
-                message: ['user_not_found']
-            });
-        }
-        else if (!verifyHash(password, user.password)) {
-            return response.status(200).json({
-                authorized: false,
-                message: ['wrong_password']
-            });
+            return response.status(201).end();
         }
         else {
-            const {
-                token,
-                expires
-            } = generate(user);
-            return response.status(200).json({
-                authorized: true,
-                token,
-                expires
-            });
+            return response.status(400).json(validation.errors).end('Bad Request');
         }
     };
 
     async emailExists(request: Request, response: Response) {
-        const email = request.query['email']?.toString() ?? '';
+        const email = request.query.email;
 
-        if (!email) {
+        if (email) {
+            const data = await findOne({ email });
+
+            return response.status(200).json({
+                email,
+                valid: mailRegExp.test(email as string),
+                notExists: !!!data?.id
+            });
+        } else {
             return response.status(400).end();
         }
 
-        const data = await findOne({ email });
-
-        return response.status(200).json({
-            email,
-            exists: !!data
-        });
     };
 
     async loginExists(request: Request, response: Response) {
-        const login = request.query['login']?.toString() ?? '';
+        const login = request.query.login;
 
-        if (!login) {
+        if (login) {
+            const data = await findOne({ login });
+
+            return response.status(200).json({
+                login,
+                valid: loginRegExp.test(login as string),
+                notExists: !!!data?.id
+            });
+        } else {
             return response.status(400).end();
         }
+    };
 
-        const data = await findOne({ login });
+    async activateAccount(request: Request, response: Response) {
+        try {
+            const token = request.query.token;
 
-        return response.status(200).json({
-            login,
-            exists: !!data
-        });
+            const { valid, result } = tokenInfo(token as string)
+
+            if (!valid) {
+                return response.status(401).end('Unauthorized');
+            }
+            else {
+                const user = result.user as User;
+                user.active = true;
+                await update(user.id as number, user);
+                return response.status(200).end('Account Activated');
+            }
+        }
+        catch (e: any) {
+            return response.status(500).end('Internal Server Error');
+        }
     };
 
 }
