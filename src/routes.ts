@@ -9,16 +9,11 @@ const authNeeded = AuthController.prototype.authMiddleware;
 
 router.post('/user/authenticate', AuthController.prototype.authenticate);
 
-router.get("/status", async (req, res) => {
-    const ip_components: Array<string> = req.ip.split(':');
-    const ip = ip_components[ip_components.length - 1];
-
-    const pingObj = await ping.promise.probe(ip);
-
+router.get("/status", (req, res) => {
     return res.json({
         status: 'good',
         ping: {
-            response_time: (pingObj.time === 'unknown' ? 0 : pingObj.time),
+            response_time: 200,
             in: 'ms'
         }
     });
