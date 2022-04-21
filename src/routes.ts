@@ -11,8 +11,17 @@ router.post('/user/authenticate', AuthController.prototype.authenticate);
 
 router.get("/status", async (req, res) => {
     const ip_components: Array<string> = req.ip.split(':');
-    const ip = ip_components[ip_components.length - 1]
-    return res.json({ status: 'good', ip });
+    const ip = ip_components[ip_components.length - 1];
+
+    const pingObj = await ping.promise.probe(ip);
+
+    return res.json({
+        status: 'good',
+        ping: {
+            response_time: (pingObj.time === 'unknown' ? 0 : pingObj.time),
+            in: 'ms'
+        }
+    });
 });
 
 router.post('/user', UserController.prototype.create);
