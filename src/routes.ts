@@ -2,14 +2,17 @@ import { Router } from 'express';
 import AuthController from './controllers/auth-controller';
 import GlucoseRecordController from './controllers/glucose-record-controller';
 import UserController from './controllers/user-controller';
+import ping from 'ping';
 
 const router = Router();
 const authNeeded = AuthController.prototype.authMiddleware;
 
 router.post('/user/authenticate', AuthController.prototype.authenticate);
 
-router.get("/status", (req, res) => {
-    return res.json({ status: 'good', ip: req.ip });
+router.get("/status", async (req, res) => {
+    const ip_components: Array<string> = req.ip.split(':');
+    const ip = ip_components[ip_components.length - 1]
+    return res.json({ status: 'good', ip });
 });
 
 router.post('/user', UserController.prototype.create);
