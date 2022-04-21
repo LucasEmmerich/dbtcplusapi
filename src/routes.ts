@@ -9,7 +9,7 @@ const authNeeded = AuthController.prototype.authMiddleware;
 router.post('/user/authenticate', AuthController.prototype.authenticate);
 
 router.get("/status", (req, res) => {
-    res.json({ status: 'good' });
+    return res.json({ status: 'good', ip: req.ip });
 });
 
 router.post('/user', UserController.prototype.create);
