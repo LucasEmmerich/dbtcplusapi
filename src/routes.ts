@@ -28,4 +28,8 @@ router.put('/glucose-record/:id', authNeeded, GlucoseRecordController.prototype.
 router.delete('/glucose-record/:id', authNeeded, GlucoseRecordController.prototype.delete);
 // router.get('/list', GlucoseRecordController.prototype.list);
 
+
+// teste2
+
+
 export default router;
