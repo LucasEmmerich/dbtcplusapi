@@ -12,10 +12,7 @@ router.post('/user/authenticate', AuthController.prototype.authenticate);
 router.get("/status", (req, res) => {
     return res.json({
         status: 'good',
-        ping: {
-            response_time: 200,
-            in: 'ms'
-        }
+        response_time: '150ms'
     });
 });
 
