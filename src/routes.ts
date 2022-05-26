@@ -15,7 +15,7 @@ router.get("/status", (req, res) => {
         response_time: '150ms'
     });
 });
-
+//teste1
 router.post('/user', UserController.prototype.create);
 router.put('/user', authNeeded, UserController.prototype.update);
 router.get('/user/emailexists', UserController.prototype.emailExists);
