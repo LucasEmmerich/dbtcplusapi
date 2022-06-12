@@ -126,8 +126,10 @@ async function getBestDosages(consumption: string, user_id: number) {
             from glucose_record
             where user_id = ${user_id}
             order by ranking
-        ) as q1 where q1.consumption = ${consumption}`;
+        ) as q1 where q1.consumption = ${consumption}
+        `;
 
+        //and TIMESTAMPDIFF(HOUR,q1.unformatted_prev_created_at, q1.unformatted_created_at) <= 5
 
         return result;
     }
