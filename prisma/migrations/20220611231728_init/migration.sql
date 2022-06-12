@@ -17,7 +17,7 @@ CREATE TABLE `user` (
 -- CreateTable
 CREATE TABLE `glucose_record` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `gl_per_dl` INTEGER NOT NULL,
+    `mg_per_dl` INTEGER NOT NULL,
     `was_there_consumption` BOOLEAN NOT NULL DEFAULT false,
     `consumption` VARCHAR(191) NULL,
     `insulin_doses_used` INTEGER NULL,

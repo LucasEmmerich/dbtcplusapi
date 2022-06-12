@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { Request, Response, urlencoded } from "express";
 import { encrypt } from '../utils/cryptography';
 import { create, update, findOne } from "../services/user-service";
 import { loginRegExp, mailRegExp } from "../utils/regex";
@@ -9,7 +9,6 @@ import { sendAccountActivateEmail } from "../utils/mail/mail";
 class UserController {
 
     async create(request: Request, response: Response) {
-        const baseUrl = request.protocol + '://' + request.get('host');
 
         const { name, email, login, password } = request.body;
 
@@ -18,13 +17,17 @@ class UserController {
 
         const validation = user.validate();
         if (validation.valid) {
+
+            user.active = true; // ignora ativação por email
+
             const createdUser = await create(user);
 
-            const activeAccountHash = generateHashForAccountActivation(createdUser);
+            // const activeAccountHash = generateHashForAccountActivation(createdUser);
 
-            const urlToSend = `${baseUrl}/user/activateAccount?token=${activeAccountHash}`
+            // const baseUrl = request.protocol + '://' + request.get('host');
+            // const urlToSend = `${baseUrl}/user/activateAccount?token=${activeAccountHash}`
 
-            await sendAccountActivateEmail(email, { name, url: urlToSend });
+            // await sendAccountActivateEmail(email, { name, url: urlToSend });
 
             return response.status(201).end('Created');
         }

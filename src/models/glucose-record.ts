@@ -1,6 +1,6 @@
 class GlucoseRecord {
     id: number = 0;
-    gl_per_dl: number;
+    mg_per_dl: number;
     was_there_consumption: boolean;
     consumption: string | null;
     insulin_doses_used: number | null;
@@ -10,7 +10,7 @@ class GlucoseRecord {
 
     constructor(
         id: number = 0,
-        gl_per_dl: number,
+        mg_per_dl: number,
         was_there_consumption: boolean,
         consumption: string | null,
         insulin_doses_used: number | null,
@@ -19,7 +19,7 @@ class GlucoseRecord {
         updated_at: string | null = null
     ) {
         this.id = id;
-        this.gl_per_dl = gl_per_dl;
+        this.mg_per_dl = mg_per_dl;
         this.was_there_consumption = was_there_consumption;
         this.consumption = consumption;
         this.insulin_doses_used = insulin_doses_used;
@@ -31,7 +31,7 @@ class GlucoseRecord {
 
 interface GlucoseRecordUpdateType {
     id?: number
-    gl_per_dl?: number
+    mg_per_dl?: number
     was_there_consumption?: boolean
     consumption?: string | null
     insulin_doses_used?: number | null

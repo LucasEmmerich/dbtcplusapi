@@ -20,7 +20,7 @@ async function listByUser(id: number, pageWidth: number, page: number) {
         const data = queryData.map((glr: any) => {
             return new GlucoseRecord(
                 glr.id,
-                glr.gl_per_dl,
+                glr.mg_per_dl,
                 glr.was_there_consumption,
                 glr.consumption,
                 glr.insulin_doses_used,
@@ -41,7 +41,7 @@ async function create(obj: GlucoseRecord) {
     try {
         const { id } = await database.glucose_record.create({
             data: {
-                gl_per_dl: obj.gl_per_dl,
+                mg_per_dl: obj.mg_per_dl,
                 insulin_doses_used: obj.insulin_doses_used,
                 user_id: obj.user_id,
                 was_there_consumption: obj.was_there_consumption,
@@ -88,9 +88,59 @@ async function remove(id: number, user_id: number) {
     }
 }
 
+async function listConsumption(q: string, user_id: number) { 
+    try {
+        const result = await database.$queryRaw`
+            SELECT DISTINCT(consumption) as consumption
+            FROM 
+            glucose_record 
+            where user_id = ${user_id} 
+            order by LENGTH(longest_common_substring( ${q} , consumption)) desc
+            LIMIT 10;
+        `;
+        return result.map((x: any) => x.consumption);
+    }
+    catch (e: any) {
+        throw e;
+    }
+}
+
+async function getBestDosages(consumption: string, user_id: number) { 
+    try {
+        const glycemic_goal = 100;
+        const result = await database.$queryRaw`
+        select *from
+        (
+            select 
+            id, 
+            ABS(mg_per_dl - ${glycemic_goal}) as ranking,
+            mg_per_dl, 
+            was_there_consumption,
+            consumption,
+            insulin_doses_used,
+            date_format(created_at,'%d/%m/%Y %H:%i:%S') as created_at,
+            (mg_per_dl - LAG(mg_per_dl, 1) over (order by created_at)) score,
+            LAG(mg_per_dl, 1) over (order by created_at) as prev_mg_per_dl,
+            LAG(insulin_doses_used, 1) over (order by created_at) as prev_insulin_doses_used,
+            date_format(LAG(created_at, 1) over (order by created_at),'%d/%m/%Y %H:%i:%S') as prev_created_at
+            from glucose_record
+            where user_id = ${user_id}
+            order by ranking
+        ) as q1 where q1.consumption = ${consumption}`;
+
+
+        return result;
+    }
+    catch (e: any) {
+        throw e;
+    }
+}
+
 export {
     create,
     update,
     remove,
-    listByUser
+    listByUser,
+    listConsumption,
+    getBestDosages
 }

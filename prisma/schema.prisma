@@ -22,7 +22,7 @@ model user {
 
 model glucose_record {       
   id                        Int              @default(autoincrement()) @id
-  gl_per_dl                 Int       
+  mg_per_dl                 Int       
   was_there_consumption     Boolean          @default(false)
   consumption               String?         
   insulin_doses_used        Int?          

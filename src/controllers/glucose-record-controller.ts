@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
-import moment from "moment";
 import { GlucoseRecord, GlucoseRecordUpdateType } from "../models/glucose-record";
-import { create, listByUser, remove, update } from "../services/glucose-record-service";
+import { create, listByUser, remove, update, listConsumption, getBestDosages } from "../services/glucose-record-service";
 class GlucoseRecordController {
 
     async list(request: Request, response: Response) {
@@ -25,7 +24,7 @@ class GlucoseRecordController {
     async create(request: Request, response: Response) {
         try {
             const {
-                gl_per_dl,
+                mg_per_dl,
                 was_there_consumption,
                 consumption,
                 insulin_doses_used,
@@ -34,7 +33,7 @@ class GlucoseRecordController {
 
             const glucose_record = new GlucoseRecord(
                 0,
-                gl_per_dl,
+                mg_per_dl,
                 was_there_consumption,
                 consumption,
                 insulin_doses_used,
@@ -96,6 +95,34 @@ class GlucoseRecordController {
             if(e.message.includes('Unknown arg')){
                 return response.status(400).end('Bad Request');
             }
+            return response.status(500).end('Internal Server Error');
+        }
+    };
+
+    async listConsumption(request: Request, response: Response) { 
+        try {
+            const q = request.query.q as string;
+            const user_id = request.body.user_info.id;
+
+            const data = await listConsumption(q, user_id);
+
+            return response.status(200).json(data);
+        }
+        catch (e: any) {
+            return response.status(500).end('Internal Server Error');
+        }
+    };
+
+    async getBestDosages(request: Request, response: Response) { 
+        try {
+            const consumption = request.query.consumption as string;
+            const user_id = request.body.user_info.id;
+            
+            const data = await getBestDosages(consumption, user_id);
+
+            return response.status(200).json(data);
+        }
+        catch (e: any) {
             return response.status(500).end('Internal Server Error');
         }
     };
