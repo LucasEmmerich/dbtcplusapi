@@ -10,7 +10,7 @@ COPY package*.json ./
 COPY prisma ./prisma/
 COPY .env ./
 
-RUN npm install && npm install -g prisma && npx prisma migrate dev
+RUN npm install && npx prisma migrate dev
 # If you are building your code for production
 # RUN npm ci --only=production
 
@@ -19,5 +19,3 @@ COPY . .
 
 EXPOSE 8080
 CMD [ "npm","run","dev" ]
-
-
