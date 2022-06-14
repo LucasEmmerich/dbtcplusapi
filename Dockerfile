@@ -18,4 +18,6 @@ RUN npm install && npx prisma migrate dev
 COPY . .
 
 EXPOSE 8080
+
+CMD [ "mysql","--user=\"root\""," --database=\"dev_dbtcplus\"", "--password=\"\"", "<", "prisma/inicial-scripts.sql" ]
 CMD [ "npm","run","dev" ]
