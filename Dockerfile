@@ -17,7 +17,7 @@ RUN npm install && npm install -g prisma && npx prisma migrate dev
 # Bundle app source
 COPY . .
 
-EXPOSE 3000
+EXPOSE 8080
 CMD [ "npm","run","dev" ]
 
 
