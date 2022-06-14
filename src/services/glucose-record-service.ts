@@ -117,7 +117,8 @@ async function getBestDosages(consumption: string, user_id: number) {
             mg_per_dl, 
             was_there_consumption,
             consumption,
-            insulin_doses_used 
+            insulin_doses_used,
+            date_format(created_at,'%d/%m/%Y %H:%i:%S') as created_at 
             from glucose_record
             where user_id = ${user_id}
             order by ranking
