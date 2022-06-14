@@ -1,5 +1,3 @@
-use dev_dbtcplus;
-
 DELIMITER $$
 CREATE FUNCTION levenshtein( s1 VARCHAR(255), s2 VARCHAR(255) )
     RETURNS INT
