@@ -1,5 +1,9 @@
 use dev_dbtcplus;
 
+set character_set_client = utf8mb4;
+set character_set_connection = utf8mb4;
+set character_set_results = utf8mb4;
+
 DELIMITER $$
 CREATE FUNCTION levenshtein( s1 VARCHAR(255), s2 VARCHAR(255) )
     RETURNS INT
