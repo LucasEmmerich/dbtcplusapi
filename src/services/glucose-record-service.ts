@@ -114,6 +114,7 @@ async function getBestDosages(consumption: string, user_id: number, glycemic_goa
             id, 
             ABS(mg_per_dl - ${glycemic_goal}) as ranking,
             mg_per_dl, 
+            TIMESTAMPDIFF(MINUTE,LAG(created_at, 1) over (order by created_at), created_at) as minutes_diff,
             was_there_consumption,
             consumption,
             insulin_doses_used,
