@@ -117,8 +117,9 @@ class GlucoseRecordController {
         try {
             const consumption = request.query.consumption as string;
             const user_id = request.body.user_info.id;
+            const glycemic = isNaN(Number(request.query.glycemic)) ? 100 : Number(request.query.glycemic)
             
-            const data = await getBestDosages(consumption, user_id);
+            const data = await getBestDosages(consumption, user_id, glycemic);
 
             return response.status(200).json(data);
         }

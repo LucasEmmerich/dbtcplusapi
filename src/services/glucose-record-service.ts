@@ -105,9 +105,8 @@ async function listConsumption(q: string, user_id: number) {
     }
 }
 
-async function getBestDosages(consumption: string, user_id: number) { 
+async function getBestDosages(consumption: string, user_id: number, glycemic_goal: number = 100) { 
     try {
-        const glycemic_goal = 100;
         const result = await database.$queryRaw`
         select *from
         (
