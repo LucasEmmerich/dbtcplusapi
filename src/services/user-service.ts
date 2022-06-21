@@ -12,8 +12,9 @@ async function create(obj: User) {
                 email: obj.email as string,
                 login: obj.login as string,
                 password: obj.password as string,
-                created_at: new Date(moment().subtract(3,'hours').format('YYYY-MM-DD H:mm:s')),
-                updated_at: new Date(moment().subtract(3,'hours').format('YYYY-MM-DD H:mm:s'))
+                active: true,
+                created_at: new Date(moment().subtract(3,'hours').format('YYYY-MM-DD H:mm:ss')),
+                updated_at: new Date(moment().subtract(3,'hours').format('YYYY-MM-DD H:mm:ss'))
             }
         });
         return response;
@@ -33,7 +34,7 @@ async function update(id: number, obj: User) {
                 login: obj.login, 
                 active:obj.active,
                 password: obj.password,
-                updated_at: new Date(moment().format('YYYY-MM-DD H:mm:s'))
+                updated_at: new Date(moment().format('YYYY-MM-DD H:mm:ss'))
             }
         });
         return response;
@@ -45,9 +46,15 @@ async function update(id: number, obj: User) {
 
 async function findOne(filters: any) {
     try {
-        const user = await database.user.findFirst(
-            { where: filters }
-        );
+        const user = await database.user.findFirst({
+            where: {
+              OR: [
+                { login: filters.login },
+                { email: filters.login }
+              ],
+              AND: { active: true }
+            }
+          });
         return user;
     }
     catch (e: any) {

@@ -25,8 +25,8 @@ async function listByUser(id: number, pageWidth: number, page: number) {
                 glr.consumption,
                 glr.insulin_doses_used,
                 glr.user_id,
-                moment(glr.created_at).format('DD/MM/YYYY H:mm:s'),
-                moment(glr.updated_at).format('DD/MM/YYYY H:mm:s'),
+                moment(glr.created_at).format('DD/MM/YYYY H:mm:ss'),
+                moment(glr.updated_at).format('DD/MM/YYYY H:mm:ss'),
             );
         })
 
@@ -46,14 +46,13 @@ async function create(obj: GlucoseRecord) {
                 user_id: obj.user_id,
                 was_there_consumption: obj.was_there_consumption,
                 consumption: obj.consumption,
-                created_at: new Date(moment().subtract(3,'hours').format('YYYY-MM-DD H:m:s')),
-                updated_at: new Date(moment().subtract(3,'hours').format('YYYY-MM-DD H:m:s'))
+                created_at: new Date(moment().subtract(3,'hours').format('YYYY-MM-DD H:m:ss')),
+                updated_at: new Date(moment().subtract(3,'hours').format('YYYY-MM-DD H:m:ss'))
             }
         });
         return id;
     }
     catch (e: any) {
-        console.log(e)
         throw e;
     }
 };
