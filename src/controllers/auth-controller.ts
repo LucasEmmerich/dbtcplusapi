@@ -16,6 +16,8 @@ class AuthController {
                 const { id, name, login } = result.user;
                 request.body.user_info = { id, name, login };
                 forward();
+            } else {
+                return response.status(401).end('Unauthorized');
             }
         }
     };
