@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { GlucoseRecord, GlucoseRecordUpdateType } from "../models/glucose-record";
 import { create, listByUser, remove, update, listConsumption, getBestDosages } from "../services/glucose-record-service";
+import { getDashboardData } from "../services/user-service";
 class GlucoseRecordController {
 
     async list(request: Request, response: Response) {
@@ -12,7 +13,13 @@ class GlucoseRecordController {
                 return response.status(400).end('Bad Request');
             }
 
-            const data = await listByUser(id, pageWidth, page);
+            const records = await listByUser(id, pageWidth, page);
+            const dashBoardData = await getDashboardData(id);
+
+            const data = {
+                records,
+                dashBoardData
+            }
 
             return response.status(200).json(data).end();
         }
