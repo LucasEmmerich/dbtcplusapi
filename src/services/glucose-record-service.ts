@@ -46,8 +46,8 @@ async function create(obj: GlucoseRecord) {
                 user_id: obj.user_id,
                 was_there_consumption: obj.was_there_consumption,
                 consumption: obj.consumption,
-                created_at: new Date(moment().format('YYYY-MM-DD HH:m:ss')),
-                updated_at: new Date(moment().format('YYYY-MM-DD HH:m:ss'))
+                created_at: new Date(),
+                updated_at: new Date()
             }
         });
         return id;
