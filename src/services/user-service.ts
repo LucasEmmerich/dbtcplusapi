@@ -13,8 +13,8 @@ async function create(obj: User) {
                 login: obj.login as string,
                 password: obj.password as string,
                 active: true,
-                created_at: new Date(moment().subtract(3, 'hours').format('YYYY-MM-DD H:mm:ss')),
-                updated_at: new Date(moment().subtract(3, 'hours').format('YYYY-MM-DD H:mm:ss'))
+                created_at: new Date(moment().format('YYYY-MM-DD H:mm:ss')),
+                updated_at: new Date(moment().format('YYYY-MM-DD H:mm:ss'))
             }
         });
         return response;
@@ -68,10 +68,10 @@ async function getDashboardData(user_id: number) {
             select count(*) as count, FLOOR(avg(mg_per_dl)) as average from (select mg_per_dl from glucose_record where current_date() = (DATE_FORMAT(created_at, "%Y-%m-%d")) and user_id = ${user_id}) regs;
         `;
         const weekAverage = await database.$queryRaw`
-            select count(*) as count, FLOOR(avg(mg_per_dl)) as average from (select mg_per_dl from glucose_record where DATE_FORMAT(current_date(), '%Y') = (DATE_FORMAT(created_at, '%Y')) and WEEK(current_date()) = week(created_at)) regs;
+            select count(*) as count, FLOOR(avg(mg_per_dl)) as average from (select mg_per_dl from glucose_record where DATE_FORMAT(current_date(), '%Y') = (DATE_FORMAT(created_at, '%Y')) and WEEK(current_date()) = week(created_at) and user_id = ${user_id}) regs;
         `;
         const monthAverage = await database.$queryRaw`
-            select count(*) as count, FLOOR(avg(mg_per_dl)) as average from (select mg_per_dl from glucose_record where DATE_FORMAT(current_date(), '%Y-%m') = (DATE_FORMAT(created_at, '%Y-%m'))) regs;
+            select count(*) as count, FLOOR(avg(mg_per_dl)) as average from (select mg_per_dl from glucose_record where DATE_FORMAT(current_date(), '%Y-%m') = (DATE_FORMAT(created_at, '%Y-%m')) and user_id = ${user_id}) regs;
         `;
         const lastRegister = await database.$queryRaw`
             select mg_per_dl, created_at from glucose_record where user_id = ${user_id} order by created_at desc limit 1;
@@ -79,9 +79,9 @@ async function getDashboardData(user_id: number) {
 
         return {
             todayAverage,
-            lastRegister,
             weekAverage,
-            monthAverage
+            monthAverage,
+            lastRegister
         };
     }
     catch (e: any) {
