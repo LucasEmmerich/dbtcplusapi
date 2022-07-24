@@ -13,8 +13,8 @@ async function create(obj: User) {
                 login: obj.login as string,
                 password: obj.password as string,
                 active: true,
-                created_at: new Date(moment().format('YYYY-MM-DD HH:mm:ss')),
-                updated_at: new Date(moment().format('YYYY-MM-DD HH:mm:ss'))
+                created_at: new Date(moment().format('YYYY-MM-DD H:mm:ss')),
+                updated_at: new Date(moment().format('YYYY-MM-DD H:mm:ss'))
             }
         });
         return response;
@@ -34,7 +34,7 @@ async function update(id: number, obj: User) {
                 login: obj.login,
                 active: obj.active,
                 password: obj.password,
-                updated_at: new Date(moment().format('YYYY-MM-DD HH:mm:ss'))
+                updated_at: new Date(moment().format('YYYY-MM-DD H:mm:ss'))
             }
         });
         return response;
