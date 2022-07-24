@@ -77,7 +77,7 @@ async function getDashboardData(user_id: number) {
             select count(*) as count, FLOOR(avg(mg_per_dl)) as average from (select mg_per_dl from glucose_record where DATE_FORMAT(current_date(), '%Y-%m') = (DATE_FORMAT(created_at, '%Y-%m')) and user_id = ${user_id}) regs;
         `;
         const lastRegisterQuery = await database.$queryRaw`
-            select mg_per_dl, created_at from glucose_record where user_id = ${user_id} order by created_at desc limit 1;
+            select mg_per_dl, date_format(created_at,'%d/%m/%Y %H:%i:%S') from glucose_record where user_id = ${user_id} order by created_at desc limit 1;
         `;
 
         return {
