@@ -20,6 +20,7 @@ router.put('/user', authNeeded, UserController.prototype.update);
 router.get('/user/emailexists', UserController.prototype.emailExists);
 router.get('/user/loginexists', UserController.prototype.loginExists);
 router.get('/user/activateAccount', UserController.prototype.activateAccount);
+router.get('/user/dashboardData',authNeeded , UserController.prototype.getDashboardData);
 
 router.get('/glucose-record', authNeeded, GlucoseRecordController.prototype.list);
 router.post('/glucose-record', authNeeded, GlucoseRecordController.prototype.create);

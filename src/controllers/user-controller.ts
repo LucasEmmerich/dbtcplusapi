@@ -1,6 +1,6 @@
 import { Request, Response, urlencoded } from "express";
 import { encrypt } from '../utils/cryptography';
-import { create, update, findOne } from "../services/user-service";
+import { create, update, findOne, getDashboardData } from "../services/user-service";
 import { loginRegExp, mailRegExp } from "../utils/regex";
 import { generateHashForAccountActivation, tokenInfo } from "../utils/auth";
 import User from "../models/user";
@@ -107,6 +107,19 @@ class UserController {
         }
     };
 
+
+    async getDashboardData(request: Request, response: Response) {
+        try {
+            const user_id = request.body.user_info.id;
+
+            const data = await getDashboardData(user_id);
+
+            return response.status(200).json(data);
+        }
+        catch (e: any) {
+            return response.status(500).end('Internal Server Error');
+        }
+    }
 }
 
 export default UserController;
