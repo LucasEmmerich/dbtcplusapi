@@ -64,24 +64,28 @@ async function findOne(filters: any) {
 
 async function getDashboardData(user_id: number) {
     try {
-        const todayAverage = await database.$queryRaw`
+        const todayAverageQuery = await database.$queryRaw`
             select count(*) as count, FLOOR(avg(mg_per_dl)) as average from (select mg_per_dl from glucose_record where current_date() = (DATE_FORMAT(created_at, "%Y-%m-%d")) and user_id = ${user_id}) regs;
         `;
-        const weekAverage = await database.$queryRaw`
+        const todayInsulin_doses_usedQuery = await database.$queryRaw`
+            select count(*) as count, sum(insulin_doses_used) as today_insulin_doses_used from glucose_record where current_date() = (DATE_FORMAT(created_at, "%Y-%m-%d")) and user_id = ${user_id} group by DATE_FORMAT(created_at, "%Y-%m-%d");
+        `;
+        const weekAverageQuery = await database.$queryRaw`
             select count(*) as count, FLOOR(avg(mg_per_dl)) as average from (select mg_per_dl from glucose_record where DATE_FORMAT(current_date(), '%Y') = (DATE_FORMAT(created_at, '%Y')) and WEEK(current_date()) = week(created_at) and user_id = ${user_id}) regs;
         `;
-        const monthAverage = await database.$queryRaw`
+        const monthAverageQuery = await database.$queryRaw`
             select count(*) as count, FLOOR(avg(mg_per_dl)) as average from (select mg_per_dl from glucose_record where DATE_FORMAT(current_date(), '%Y-%m') = (DATE_FORMAT(created_at, '%Y-%m')) and user_id = ${user_id}) regs;
         `;
-        const lastRegister = await database.$queryRaw`
+        const lastRegisterQuery = await database.$queryRaw`
             select mg_per_dl, created_at from glucose_record where user_id = ${user_id} order by created_at desc limit 1;
         `;
 
         return {
-            todayAverage,
-            weekAverage,
-            monthAverage,
-            lastRegister
+            todayAverage: todayAverageQuery[0],
+            weekAverage: weekAverageQuery[0],
+            monthAverage: monthAverageQuery[0],
+            lastRegister: lastRegisterQuery[0],
+            todayInsulin_doses_used: todayInsulin_doses_usedQuery[0]
         };
     }
     catch (e: any) {
