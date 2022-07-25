@@ -13,12 +13,14 @@ class GlucoseRecordController {
                 return response.status(400).end('Bad Request');
             }
 
-            const records = await listByUser(id, pageWidth, page);
+            const { records, contentLength } = await listByUser(id, pageWidth, page);
             const dashBoardData = await getDashboardData(id);
 
             const data = {
                 records,
-                dashBoardData
+                dashBoardData,
+                contentLength,
+                numberOfPages: Math.ceil(contentLength/pageWidth)
             }
 
             return response.status(200).json(data).end();

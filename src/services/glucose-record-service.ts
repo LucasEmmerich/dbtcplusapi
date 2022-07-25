@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { prisma, PrismaClient } from '@prisma/client';
 import { GlucoseRecord, GlucoseRecordUpdateType } from '../models/glucose-record';
 import moment from 'moment';
 
@@ -6,6 +6,7 @@ const database = new PrismaClient();
 
 async function listByUser(id: number, pageWidth: number, page: number) {
     try {
+        const contentLength = await database.glucose_record.count({ where: { user_id: id } });
         const queryData = await database.glucose_record.findMany({
             where: {
                 user_id: id
@@ -17,7 +18,7 @@ async function listByUser(id: number, pageWidth: number, page: number) {
             take: pageWidth
         });
 
-        const data = queryData.map((glr: any) => {
+        const records = queryData.map((glr: any) => {
             return new GlucoseRecord(
                 glr.id,
                 glr.mg_per_dl,
@@ -30,7 +31,7 @@ async function listByUser(id: number, pageWidth: number, page: number) {
             );
         })
 
-        return data;
+        return { records, contentLength };
     }
     catch (e: any) {
         throw e;
@@ -46,8 +47,8 @@ async function create(obj: GlucoseRecord) {
                 user_id: obj.user_id,
                 was_there_consumption: obj.was_there_consumption,
                 consumption: obj.consumption,
-                created_at: new Date(moment().subtract(3,'hours').format('YYYY-MM-DD H:m:ss')), //dps ver pq caralhos essa data vem errada
-                updated_at: new Date(moment().subtract(3,'hours').format('YYYY-MM-DD H:m:ss'))
+                created_at: new Date(moment().subtract(3, 'hours').format('YYYY-MM-DD H:m:ss')), //dps ver pq caralhos essa data vem errada
+                updated_at: new Date(moment().subtract(3, 'hours').format('YYYY-MM-DD H:m:ss'))
             }
         });
         return id;
@@ -60,9 +61,9 @@ async function create(obj: GlucoseRecord) {
 async function update(id: number, user_id: number, obj: GlucoseRecordUpdateType) {
     try {
         await database.glucose_record.updateMany({
-            where: { 
-                user_id, 
-                id 
+            where: {
+                user_id,
+                id
             },
             data: obj,
         });
@@ -72,22 +73,22 @@ async function update(id: number, user_id: number, obj: GlucoseRecordUpdateType)
     }
 }
 
-async function remove(id: number, user_id: number) { 
+async function remove(id: number, user_id: number) {
     try {
         await database.glucose_record.deleteMany({
-            where: { 
-                user_id, 
-                id 
+            where: {
+                user_id,
+                id
             }
         });
     }
     catch (e: any) {
-        if(e.code === 'P2025') return;
+        if (e.code === 'P2025') return;
         throw e;
     }
 }
 
-async function listConsumption(q: string, user_id: number) { 
+async function listConsumption(q: string, user_id: number) {
     try {
         const result = await database.$queryRaw`
             SELECT DISTINCT(consumption) as consumption
@@ -104,7 +105,7 @@ async function listConsumption(q: string, user_id: number) {
     }
 }
 
-async function getBestDosages(consumption: string, user_id: number, glycemic_goal: number = 100) { 
+async function getBestDosages(consumption: string, user_id: number, glycemic_goal: number = 100) {
     try {
         const result = await database.$queryRaw`
         select *from
