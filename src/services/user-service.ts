@@ -68,7 +68,7 @@ async function getDashboardData(user_id: number) {
             select count(*) as count, FLOOR(avg(mg_per_dl)) as average from (select mg_per_dl from glucose_record where current_date() = (DATE_FORMAT(created_at, "%Y-%m-%d")) and user_id = ${user_id}) regs;
         `;
         const todayInsulin_doses_usedQuery = await database.$queryRaw`
-            select count(*) as count, sum(insulin_doses_used) as today_insulin_doses_used from glucose_record where current_date() = (DATE_FORMAT(created_at, "%Y-%m-%d")) and user_id = ${user_id} group by DATE_FORMAT(created_at, "%Y-%m-%d");
+            select count(*) as count, sum(insulin_doses_used) as today_insulin_doses_used from glucose_record where current_date() = (DATE_FORMAT(created_at, "%Y-%m-%d")) and user_id = ${user_id} group by DATE_FORMAT(created_at, "%Y-%m-%d") limit 1;
         `;
         const weekAverageQuery = await database.$queryRaw`
             select count(*) as count, FLOOR(avg(mg_per_dl)) as average from (select mg_per_dl from glucose_record where DATE_FORMAT(current_date(), '%Y') = (DATE_FORMAT(created_at, '%Y')) and WEEK(current_date()) = week(created_at) and user_id = ${user_id}) regs;
@@ -80,12 +80,13 @@ async function getDashboardData(user_id: number) {
             select mg_per_dl, date_format(created_at,'%d/%m/%Y %H:%i:%S') as created_at from glucose_record where user_id = ${user_id} order by created_at desc limit 1;
         `;
 
+        console.log(todayInsulin_doses_usedQuery)
         return {
             todayAverage: todayAverageQuery[0],
             weekAverage: weekAverageQuery[0],
             monthAverage: monthAverageQuery[0],
-            lastRegister: lastRegisterQuery[0],
-            todayInsulin_doses_used: todayInsulin_doses_usedQuery[0]
+            lastRegister: lastRegisterQuery[0] ?? { mg_per_dl: null, created_at: null },
+            todayInsulin_doses_used: todayInsulin_doses_usedQuery[0] ?? { count: 0, today_insulin_doses_used: 0}
         };
     }
     catch (e: any) {
