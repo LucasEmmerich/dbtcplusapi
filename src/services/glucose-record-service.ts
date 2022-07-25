@@ -95,6 +95,7 @@ async function listConsumption(q: string, user_id: number) {
             FROM 
             glucose_record 
             where user_id = ${user_id} 
+            and was_there_consumption = 1 
             order by LENGTH(longest_common_substring( ${q} , consumption)) desc
             LIMIT 10;
         `;
