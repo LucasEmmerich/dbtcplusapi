@@ -80,13 +80,12 @@ async function getDashboardData(user_id: number) {
             select mg_per_dl, date_format(created_at,'%d/%m/%Y %H:%i:%S') as created_at from glucose_record where user_id = ${user_id} order by created_at desc limit 1;
         `;
 
-        console.log(todayInsulin_doses_usedQuery)
         return {
             todayAverage: todayAverageQuery[0],
             weekAverage: weekAverageQuery[0],
             monthAverage: monthAverageQuery[0],
             lastRegister: lastRegisterQuery[0] ?? { mg_per_dl: null, created_at: null },
-            todayInsulin_doses_used: todayInsulin_doses_usedQuery[0] ?? { count: 0, today_insulin_doses_used: 0}
+            todayInsulin_doses_used: todayInsulin_doses_usedQuery[0] ?? { count: 0, today_insulin_doses_used: 0 }
         };
     }
     catch (e: any) {
