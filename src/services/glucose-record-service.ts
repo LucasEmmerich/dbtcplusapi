@@ -47,7 +47,7 @@ async function create(obj: GlucoseRecord) {
                 user_id: obj.user_id,
                 was_there_consumption: obj.was_there_consumption,
                 consumption: obj.consumption,
-                created_at: new Date(moment().subtract(3, 'hours').format('YYYY-MM-DD H:m:ss')), //dps ver pq caralhos essa data vem errada
+                created_at: new Date(moment(obj.created_at || new Date()).subtract(3, 'hours').format('YYYY-MM-DD H:m:ss')), //dps ver pq caralhos essa data vem errada
                 updated_at: new Date(moment().subtract(3, 'hours').format('YYYY-MM-DD H:m:ss'))
             }
         });

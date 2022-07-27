@@ -37,6 +37,7 @@ class GlucoseRecordController {
                 was_there_consumption,
                 consumption,
                 insulin_doses_used,
+                created_at,
                 user_info
             } = request.body;
 
@@ -46,7 +47,8 @@ class GlucoseRecordController {
                 was_there_consumption,
                 consumption,
                 insulin_doses_used,
-                user_info.id
+                user_info.id,
+                created_at
             );
 
             await create(glucose_record);
