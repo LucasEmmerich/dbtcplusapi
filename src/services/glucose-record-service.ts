@@ -40,7 +40,6 @@ async function listByUser(id: number, pageWidth: number, page: number) {
 
 async function create(obj: GlucoseRecord) {
     try {
-        const retroactiveDate = obj.created_at ? new Date(moment(obj.created_at).format('YYYY-MM-DD H:m:ss')) : undefined;
         const { id } = await database.glucose_record.create({
             data: {
                 mg_per_dl: obj.mg_per_dl,
@@ -48,7 +47,7 @@ async function create(obj: GlucoseRecord) {
                 user_id: obj.user_id,
                 was_there_consumption: obj.was_there_consumption,
                 consumption: obj.consumption,
-                created_at: retroactiveDate || new Date(moment().subtract(3, 'hours').format('YYYY-MM-DD H:m:ss')), //dps ver pq caralhos essa data vem errada
+                created_at: new Date(moment(obj.created_at || new Date()).subtract(3, 'hours').format('YYYY-MM-DD H:m:ss')), //dps ver pq caralhos essa data vem errada
                 updated_at: new Date(moment().subtract(3, 'hours').format('YYYY-MM-DD H:m:ss'))
             }
         });
