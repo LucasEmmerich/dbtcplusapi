@@ -149,6 +149,7 @@ async function getDailyDosesReport(user_id: number, filters: { initial_date: str
             from glucose_record
             where user_id = ${user_id}
             and created_at >= ${filters.initial_date} and created_at <= ${filters.end_date}
+            and insulin_doses_used > 0
             group by date_format(created_at,'%d/%m/%Y') 
             order by created_at desc;
         `;
