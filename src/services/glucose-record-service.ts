@@ -138,11 +138,95 @@ async function getBestDosages(consumption: string, user_id: number, glycemic_goa
     }
 }
 
+async function getDailyDosesReport(user_id: number, filters: { initial_date: string, end_date: string }) {
+    try {
+        const result = await database.$queryRaw`
+            select date_format(created_at,'%d/%m/%Y') as created_at,
+            sum(insulin_doses_used) as insulin_doses_used,
+            max(insulin_doses_used) as max_insulin_doses_used,
+            count(insulin_doses_used) as count
+
+            from glucose_record
+            where user_id = ${user_id}
+            and created_at between ${filters.initial_date} and ${filters.end_date}
+            group by date_format(created_at,'%d/%m/%Y');
+        `;
+        return result;
+    }
+    catch (e: any) {
+        throw e;
+    }
+}
+
+
+async function getMonthlyDosesReport(user_id: number, filters: { initial_year: string, end_year: string }) {
+    try {
+        const result = await database.$queryRaw`
+            select date_format(created_at,'%m/%Y') as mes_ano,
+            sum(insulin_doses_used) as insulin_doses_used,
+            max(insulin_doses_used) as max_insulin_doses_used,
+            count(insulin_doses_used) as count
+            from glucose_record
+            where user_id = ${user_id}
+            and YEAR(created_at) >= ${filters.initial_year} and YEAR(created_at) <= ${filters.end_year}
+            group by date_format(created_at,'%m/%Y')
+            order by year(created_at) desc, month(created_at) desc;
+        `;
+        return result;
+    }
+    catch (e: any) {
+        throw e;
+    }
+}
+
+async function getDailyGlycemiaAverageReport(user_id: number, filters: { initial_date: string, end_date: string }) {
+    try {
+        const result = await database.$queryRaw`
+            select date_format(created_at,'%d/%m/%Y') as created_at,
+            avg(mg_per_dl) as daily_mg_per_dl,
+            max(mg_per_dl) as max_mg_per_dl,
+            count(mg_per_dl) as count
+
+            from glucose_record
+            where user_id = ${user_id}
+            and created_at between ${filters.initial_date} and ${filters.end_date}
+            group by date_format(created_at,'%d/%m/%Y');
+        `;
+        return result;
+    }
+    catch (e: any) {
+        throw e;
+    }
+}
+
+
+async function getMonthlyGlycemiaAverageReport(q: string, user_id: number) {
+    try {
+        const result = await database.$queryRaw`
+            SELECT DISTINCT(consumption) as consumption
+            FROM 
+            glucose_record 
+            where user_id = ${user_id} 
+            and was_there_consumption = 1 
+            order by LENGTH(longest_common_substring( ${q} , consumption)) desc
+            LIMIT 10;
+        `;
+        return result.map((x: any) => x.consumption);
+    }
+    catch (e: any) {
+        throw e;
+    }
+}
+
 export {
     create,
     update,
     remove,
     listByUser,
     listConsumption,
-    getBestDosages
+    getBestDosages,
+    getDailyDosesReport,
+    getMonthlyDosesReport,
+    getDailyGlycemiaAverageReport,
+    getMonthlyGlycemiaAverageReport
 }

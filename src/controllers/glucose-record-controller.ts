@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { GlucoseRecord, GlucoseRecordUpdateType } from "../models/glucose-record";
-import { create, listByUser, remove, update, listConsumption, getBestDosages } from "../services/glucose-record-service";
+import { create, listByUser, remove, update, listConsumption, getBestDosages, getDailyDosesReport, getDailyGlycemiaAverageReport } from "../services/glucose-record-service";
 import { getDashboardData } from "../services/user-service";
 class GlucoseRecordController {
 
@@ -20,7 +20,7 @@ class GlucoseRecordController {
                 records,
                 dashBoardData,
                 contentLength,
-                numberOfPages: Math.ceil(contentLength/pageWidth)
+                numberOfPages: Math.ceil(contentLength / pageWidth)
             }
 
             return response.status(200).json(data).end();
@@ -60,20 +60,20 @@ class GlucoseRecordController {
         }
     };
 
-    async update(request: Request, response: Response) { 
+    async update(request: Request, response: Response) {
         try {
             const updateData = request.body;
             const user_id = updateData.user_info.id;
 
             delete updateData.user_info,
-                   updateData.id,
-                   updateData.created_at,
-                   updateData.updated_at;
+                updateData.id,
+                updateData.created_at,
+                updateData.updated_at;
 
             const glucose_record: GlucoseRecordUpdateType = request.body;
 
             const id = Number(request.params.id);
-            if(isNaN(id)){
+            if (isNaN(id)) {
                 return response.status(400).end('Internal Server Error');
             }
 
@@ -82,19 +82,19 @@ class GlucoseRecordController {
             return response.status(200).end('OK');
         }
         catch (e: any) {
-            if(e.message.includes('Unknown arg')){
+            if (e.message.includes('Unknown arg')) {
                 return response.status(400).end('Bad Request');
             }
             return response.status(500).end('Internal Server Error');
         }
     };
 
-    async delete(request: Request, response: Response) { 
+    async delete(request: Request, response: Response) {
         try {
             const id = Number(request.params.id);
             const user_id = request.body.user_info.id;
 
-            if(isNaN(id)){
+            if (isNaN(id)) {
                 return response.status(400).end('Internal Server Error');
             }
 
@@ -103,14 +103,14 @@ class GlucoseRecordController {
             return response.status(200).end('OK');
         }
         catch (e: any) {
-            if(e.message.includes('Unknown arg')){
+            if (e.message.includes('Unknown arg')) {
                 return response.status(400).end('Bad Request');
             }
             return response.status(500).end('Internal Server Error');
         }
     };
 
-    async listConsumption(request: Request, response: Response) { 
+    async listConsumption(request: Request, response: Response) {
         try {
             const q = request.query.q as string;
             const user_id = request.body.user_info.id;
@@ -124,13 +124,51 @@ class GlucoseRecordController {
         }
     };
 
-    async getBestDosages(request: Request, response: Response) { 
+    async getBestDosages(request: Request, response: Response) {
         try {
             const consumption = request.query.consumption as string;
             const user_id = request.body.user_info.id;
             const glycemic_goal = isNaN(Number(request.query.glycemic_goal)) ? 100 : Number(request.query.glycemic_goal)
-            
+
             const data = await getBestDosages(consumption, user_id, glycemic_goal);
+
+            return response.status(200).json(data);
+        }
+        catch (e: any) {
+            return response.status(500).end('Internal Server Error');
+        }
+    };
+
+    async getDailyDosesReport(request: Request, response: Response) {
+        try {
+            const initial_date = request.query['initial-date'] as string;
+            const end_date = request.query['end-date'] as string;
+            const user_id = request.body.user_info.id;
+            const filters = {
+                initial_date,
+                end_date
+            }
+
+            const data = await getDailyDosesReport(user_id, filters);
+
+            return response.status(200).json(data);
+        }
+        catch (e: any) {
+            return response.status(500).end('Internal Server Error');
+        }
+    };
+
+    async getDailyGlycemiaAverageReport(request: Request, response: Response) {
+        try {
+            const initial_date = request.query['initial-date'] as string;
+            const end_date = request.query['end-date'] as string;
+            const user_id = request.body.user_info.id;
+            const filters = {
+                initial_date,
+                end_date
+            }
+
+            const data = await getDailyGlycemiaAverageReport(user_id, filters);
 
             return response.status(200).json(data);
         }

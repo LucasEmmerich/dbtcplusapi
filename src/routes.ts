@@ -28,6 +28,9 @@ router.put('/glucose-record/:id', authNeeded, GlucoseRecordController.prototype.
 router.delete('/glucose-record/:id', authNeeded, GlucoseRecordController.prototype.delete);
 router.get('/glucose-record/list-consumption', authNeeded, GlucoseRecordController.prototype.listConsumption);
 router.get('/glucose-record/getBestDosages', authNeeded, GlucoseRecordController.prototype.getBestDosages);
-// router.get('/list', GlucoseRecordController.prototype.list);
+
+//reports
+router.get('/glucose-record/reports/daily-doses', authNeeded, GlucoseRecordController.prototype.getDailyDosesReport);
+router.get('/glucose-record/reports/daily-glycemia', authNeeded, GlucoseRecordController.prototype.getDailyGlycemiaAverageReport);
 
 export default router;
