@@ -143,7 +143,7 @@ async function getDailyDosesReport(user_id: number, filters: { initial_date: str
         const result = await database.$queryRaw`
             select date_format(created_at,'%d/%m/%Y') as created_at,
             sum(insulin_doses_used) as insulin_doses_used,
-            CONCAT(max(insulin_doses_used), '-', min(insulin_doses_used)) as max_min_insulin_doses_used,
+            CONCAT(min(insulin_doses_used), ' - ', max(insulin_doses_used)) as min_max_insulin_doses_used,
             count(insulin_doses_used) as count
 
             from glucose_record
@@ -165,7 +165,7 @@ async function getDailyGlycemiaAverageReport(user_id: number, filters: { initial
         const result = await database.$queryRaw`
             select date_format(created_at,'%d/%m/%Y') as created_at,
             avg(mg_per_dl) as daily_mg_per_dl,
-            max(mg_per_dl) as max_mg_per_dl,
+            CONCAT(min(mg_per_dl), ' - ', max(mg_per_dl)) as min_max_mg_per_dl,
             count(mg_per_dl) as count
 
             from glucose_record
