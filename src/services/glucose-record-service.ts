@@ -156,6 +156,7 @@ async function getDailyDosesReport(user_id: number, filters: { initial_date: str
         return result;
     }
     catch (e: any) {
+        console.log(e)
         throw e;
     }
 }
@@ -177,6 +178,7 @@ async function getDailyGlycemiaAverageReport(user_id: number, filters: { initial
         return result;
     }
     catch (e: any) {
+        console.log(e)
         throw e;
     }
 }
