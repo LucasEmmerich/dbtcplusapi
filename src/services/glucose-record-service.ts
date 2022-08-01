@@ -119,7 +119,7 @@ async function getBestDosages(consumption: string, user_id: number, glycemic_goa
             was_there_consumption,
             consumption,
             insulin_doses_used,
-            date_format(created_at,'%d/%m/%Y %H:%i:%S') as curr_created_at,
+            date_format(created_at,'%d/%m/%Y %H:%i:%S') as created_at,
             (mg_per_dl - LAG(mg_per_dl, 1) over (order by created_at)) as score,
             LAG(mg_per_dl, 1) over (order by created_at) as prev_mg_per_dl,
             LAG(insulin_doses_used, 1) over (order by created_at) as prev_insulin_doses_used,
@@ -141,18 +141,17 @@ async function getBestDosages(consumption: string, user_id: number, glycemic_goa
 async function getDailyDosesReport(user_id: number, filters: { initial_date: string, end_date: string }) {
     try {
         const result = await database.$queryRaw`
-            select date_format(created_at,'%d/%m/%Y') as formatted_created_at,
-            DATE(created_at) as created_at,
+            select date_format(created_at,'%d/%m/%Y') as created_at,
             sum(insulin_doses_used) as insulin_doses_used,
             CONCAT(min(insulin_doses_used), ' - ', max(insulin_doses_used)) as min_max_insulin_doses_used,
             count(insulin_doses_used) as count
 
             from glucose_record
             where user_id = ${user_id}
-            and DATE(created_at) >= ${filters.initial_date} and DATE(created_at) <= ${filters.end_date}
+            and created_at >= ${filters.initial_date + ' 00:00:00'} and created_at <= ${filters.end_date + ' 23:59:59'}
             and insulin_doses_used > 0
             group by date_format(created_at,'%d/%m/%Y') 
-            order by created_at desc;
+            order by glucose_record.created_at desc;
         `;
         return result;
     }
@@ -164,17 +163,16 @@ async function getDailyDosesReport(user_id: number, filters: { initial_date: str
 async function getDailyGlycemiaAverageReport(user_id: number, filters: { initial_date: string, end_date: string }) {
     try {
         const result = await database.$queryRaw`
-            select date_format(created_at,'%d/%m/%Y') as formatted_created_at,
-            DATE(created_at) as created_at,
+            select date_format(created_at,'%d/%m/%Y') as created_at,
             avg(mg_per_dl) as daily_mg_per_dl,
             CONCAT(min(mg_per_dl), ' - ', max(mg_per_dl)) as min_max_mg_per_dl,
             count(mg_per_dl) as count
 
             from glucose_record
             where user_id = ${user_id}
-            and DATE(created_at) >= ${filters.initial_date} and DATE(created_at) <= ${filters.end_date}
+            and created_at >= ${filters.initial_date + ' 00:00:00'} and created_at <= ${filters.end_date + ' 23:59:59'}
             group by date_format(created_at,'%d/%m/%Y')
-            order by created_at desc;
+            order by glucose_record.created_at desc;
         `;
         return result;
     }
