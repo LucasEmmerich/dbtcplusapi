@@ -148,7 +148,7 @@ async function getDailyDosesReport(user_id: number, filters: { initial_date: str
 
             from glucose_record
             where user_id = ${user_id}
-            and created_at >= ${filters.initial_date + ' 00:00:00'} and created_at <= ${filters.end_date + ' 23:59:59'}
+            and DATE(created_at) >= ${filters.initial_date} and DATE(created_at) <= ${filters.end_date}
             and insulin_doses_used > 0
             group by date_format(created_at,'%d/%m/%Y') 
             order by created_at desc;
@@ -156,7 +156,6 @@ async function getDailyDosesReport(user_id: number, filters: { initial_date: str
         return result;
     }
     catch (e: any) {
-        console.log(e)
         throw e;
     }
 }
@@ -171,14 +170,13 @@ async function getDailyGlycemiaAverageReport(user_id: number, filters: { initial
 
             from glucose_record
             where user_id = ${user_id}
-            and created_at >= ${filters.initial_date + ' 00:00:00'} and created_at <= ${filters.end_date + ' 23:59:59'}
+            and DATE(created_at) >= ${filters.initial_date} and DATE(created_at) <= ${filters.end_date}
             group by date_format(created_at,'%d/%m/%Y')
             order by created_at desc;
         `;
         return result;
     }
     catch (e: any) {
-        console.log(e)
         throw e;
     }
 }
