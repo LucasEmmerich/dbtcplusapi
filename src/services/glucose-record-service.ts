@@ -119,7 +119,7 @@ async function getBestDosages(consumption: string, user_id: number, glycemic_goa
             was_there_consumption,
             consumption,
             insulin_doses_used,
-            date_format(created_at,'%d/%m/%Y %H:%i:%S') as created_at,
+            date_format(created_at,'%d/%m/%Y %H:%i:%S') as curr_created_at,
             (mg_per_dl - LAG(mg_per_dl, 1) over (order by created_at)) as score,
             LAG(mg_per_dl, 1) over (order by created_at) as prev_mg_per_dl,
             LAG(insulin_doses_used, 1) over (order by created_at) as prev_insulin_doses_used,
@@ -151,7 +151,7 @@ async function getDailyDosesReport(user_id: number, filters: { initial_date: str
             and created_at >= ${filters.initial_date + ' 00:00:00'} and created_at <= ${filters.end_date + ' 23:59:59'}
             and insulin_doses_used > 0
             group by date_format(created_at,'%d/%m/%Y') 
-            order by created_at desc;
+            order by glucose_record.created_at desc;
         `;
         return result;
     }
@@ -172,7 +172,7 @@ async function getDailyGlycemiaAverageReport(user_id: number, filters: { initial
             where user_id = ${user_id}
             and created_at >= ${filters.initial_date + ' 00:00:00'} and created_at <= ${filters.end_date + ' 23:59:59'}
             group by date_format(created_at,'%d/%m/%Y')
-            order by created_at desc;
+            order by glucose_record.created_at desc;
         `;
         return result;
     }
