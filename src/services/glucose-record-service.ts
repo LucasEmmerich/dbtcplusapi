@@ -141,7 +141,8 @@ async function getBestDosages(consumption: string, user_id: number, glycemic_goa
 async function getDailyDosesReport(user_id: number, filters: { initial_date: string, end_date: string }) {
     try {
         const result = await database.$queryRaw`
-            select date_format(created_at,'%d/%m/%Y') as created_at,
+            select date_format(created_at,'%d/%m/%Y') as formatted_created_at,
+            created_at,
             sum(insulin_doses_used) as insulin_doses_used,
             CONCAT(min(insulin_doses_used), ' - ', max(insulin_doses_used)) as min_max_insulin_doses_used,
             count(insulin_doses_used) as count
@@ -163,7 +164,8 @@ async function getDailyDosesReport(user_id: number, filters: { initial_date: str
 async function getDailyGlycemiaAverageReport(user_id: number, filters: { initial_date: string, end_date: string }) {
     try {
         const result = await database.$queryRaw`
-            select date_format(created_at,'%d/%m/%Y') as created_at,
+            select date_format(created_at,'%d/%m/%Y') as formatted_created_at,
+            created_at,
             avg(mg_per_dl) as daily_mg_per_dl,
             CONCAT(min(mg_per_dl), ' - ', max(mg_per_dl)) as min_max_mg_per_dl,
             count(mg_per_dl) as count
