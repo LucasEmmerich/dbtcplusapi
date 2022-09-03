@@ -11,7 +11,7 @@ router.post('/user/authenticate', AuthController.prototype.authenticate);
 router.get("/status", (req, res) => {
     return res.json({
         status: 'good',
-        response_time: '150ms'
+        responsetime: '150ms'
     });
 });
 
