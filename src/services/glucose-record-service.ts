@@ -126,6 +126,7 @@ async function getBestDosages(consumption: string, user_id: number, glycemic_goa
             date_format(LAG(created_at, 1) over (order by created_at),'%d/%m/%Y %H:%i:%S') as prev_created_at
             from glucose_record
             where user_id = ${user_id}
+            
             order by ranking
         ) as q1 where q1.consumption = ${consumption}
         having q1.minutes_diff <= 300
